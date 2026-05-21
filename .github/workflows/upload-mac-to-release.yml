@@ -3,6 +3,9 @@ name: Upload macOS to Release
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   upload:
     runs-on: macos-latest
