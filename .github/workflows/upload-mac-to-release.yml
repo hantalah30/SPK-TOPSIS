@@ -1,0 +1,22 @@
+name: Upload macOS to Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Build macOS
+        run: npx electron-builder --mac --x64 --arm64
+      - name: Upload to Release tag 1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload 1 dist/*.zip --clobber
