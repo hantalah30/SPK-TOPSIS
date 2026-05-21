@@ -1,0 +1,94 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <% if (success && success.length > 0) { %>
+            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({icon:'success',title:'Berhasil',text:'<%= success %>',timer:3000,showConfirmButton:false}));</script>
+        <% } %>
+        <% if (error && error.length > 0) { %>
+            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({icon:'error',title:'Error',text:'<%= error %>',timer:3000,showConfirmButton:false}));</script>
+        <% } %>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-laptop me-2 text-primary"></i>Data Laptop</h5>
+                <a href="/laptop/create" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i> Tambah Laptop
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="dataTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="4%">No</th>
+                                <th>Nama Laptop</th>
+                                <th>Processor</th>
+                                <th>GPU</th>
+                                <th>Harga</th>
+                                <th>RAM</th>
+                                <th>SSD</th>
+                                <th>Baterai</th>
+                                <th class="text-center">Upgrade</th>
+                                <th width="11%">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% laptops.forEach((laptop, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><strong><%= laptop.nama_laptop %></strong></td>
+                                <td><small><%= laptop.processor || '-' %></small></td>
+                                <td><small><%= laptop.gpu || '-' %></small></td>
+                                <td>Rp <%= laptop.harga.toLocaleString('id-ID') %></td>
+                                <td><%= laptop.ram %> GB</td>
+                                <td><%= laptop.ssd %> GB</td>
+                                <td><%= laptop.baterai %> Jam</td>
+                                <td class="text-center">
+                                    <% if (laptop.upgrade_ram) { %>
+                                        <span class="badge bg-success" title="RAM bisa di-upgrade"><i class="fas fa-memory"></i> RAM</span>
+                                    <% } %>
+                                    <% if (laptop.upgrade_storage) { %>
+                                        <span class="badge bg-info" title="Storage bisa di-upgrade"><i class="fas fa-hdd"></i> Storage</span>
+                                    <% } %>
+                                    <% if (!laptop.upgrade_ram && !laptop.upgrade_storage) { %>
+                                        <span class="badge bg-secondary">-</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <a href="/laptop/edit/<%= laptop.id_laptop %>" class="btn btn-warning btn-sm" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-danger btn-sm btn-delete" data-url="/laptop/delete/<%= laptop.id_laptop %>" data-name="<%= laptop.nama_laptop %>" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        (function() {
+            var table = document.getElementById('dataTable');
+            if (table && window.jQuery) {
+                if ($.fn.DataTable.isDataTable(table)) {
+                    $(table).DataTable().destroy();
+                }
+                $(table).DataTable({
+                    language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json' },
+                    scrollX: true
+                });
+            }
+        })();
+        </script>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

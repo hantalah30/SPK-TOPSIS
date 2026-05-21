@@ -1,0 +1,124 @@
+const markdownpdf = require('markdown-pdf');
+const path = require('path');
+const fs = require('fs');
+
+const mdPath = path.join(__dirname, '..', 'docs', 'Laporan_Proyek_SPK_TOPSIS.md');
+const pdfPath = path.join(__dirname, '..', 'docs', 'Laporan_Proyek_SPK_TOPSIS.pdf');
+const cssPath = path.join(__dirname, '..', 'docs', 'pdf-style.css');
+
+// Create CSS for nice PDF styling
+const css = `
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #1e293b;
+    max-width: 100%;
+    padding: 0 20px;
+}
+h1 {
+    font-size: 22px;
+    color: #1e40af;
+    border-bottom: 3px solid #3b82f6;
+    padding-bottom: 8px;
+    margin-top: 30px;
+}
+h2 {
+    font-size: 18px;
+    color: #1e40af;
+    border-bottom: 2px solid #93c5fd;
+    padding-bottom: 6px;
+    margin-top: 28px;
+}
+h3 {
+    font-size: 15px;
+    color: #1d4ed8;
+    margin-top: 20px;
+}
+h4 {
+    font-size: 13px;
+    color: #374151;
+    margin-top: 16px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 11px;
+}
+th, td {
+    border: 1px solid #d1d5db;
+    padding: 8px 10px;
+    text-align: left;
+}
+th {
+    background: #eff6ff;
+    font-weight: 700;
+    color: #1e40af;
+}
+tr:nth-child(even) {
+    background: #f8fafc;
+}
+code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'Consolas', 'Courier New', monospace;
+}
+pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 10px;
+    overflow-x: auto;
+    line-height: 1.5;
+}
+pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+}
+blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 16px;
+    color: #475569;
+    margin: 12px 0;
+}
+ul, ol {
+    padding-left: 24px;
+}
+li {
+    margin-bottom: 4px;
+}
+hr {
+    border: none;
+    border-top: 2px solid #e2e8f0;
+    margin: 24px 0;
+}
+strong {
+    color: #1e293b;
+}
+`;
+
+fs.writeFileSync(cssPath, css);
+
+const options = {
+    cssPath: cssPath,
+    paperFormat: 'A4',
+    paperBorder: '1.5cm',
+    remarkable: {
+        html: true,
+        breaks: true
+    }
+};
+
+console.log('Generating PDF...');
+markdownpdf(options)
+    .from(mdPath)
+    .to(pdfPath, function() {
+        console.log('PDF generated:', pdfPath);
+        const stats = fs.statSync(pdfPath);
+        console.log('Size:', (stats.size / 1024).toFixed(1), 'KB');
+    });

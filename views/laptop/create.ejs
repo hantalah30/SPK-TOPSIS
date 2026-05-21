@@ -1,0 +1,129 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <% if (error && error.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-exclamation-circle me-2"></i><%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-plus-circle me-2 text-primary"></i>Tambah Laptop Baru</h5>
+            </div>
+            <div class="card-body">
+                <form action="/laptop/create" method="POST">
+                    
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3" style="letter-spacing:0.5px;">Info Utama</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nama Laptop <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="inputLaptopName" name="nama_laptop" placeholder="Klik untuk pilih dari database, atau ketik manual..." autocomplete="off" required>
+                            <small class="text-muted" style="font-size:11px;"><i class="fas fa-database"></i> Pilih dari database untuk auto-isi semua spesifikasi</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="harga" placeholder="7500000" min="0" required>
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3 mt-2" style="letter-spacing:0.5px;">Spesifikasi</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">RAM (GB) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="ram" placeholder="8" min="1" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">SSD (GB) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="ssd" placeholder="512" min="1" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Baterai (Jam) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="baterai" placeholder="8" min="1" required>
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3 mt-2" style="letter-spacing:0.5px;">Processor & GPU</h6>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Processor</label>
+                            <input type="text" class="form-control" id="inputProcessor" name="processor" placeholder="Klik untuk pilih, atau ketik..." autocomplete="off">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Skor (1-10)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="form-range" name="skor_processor" id="skorProc" min="1" max="10" value="5" oninput="document.getElementById('skorProcVal').textContent = this.value">
+                                <span class="badge bg-primary" id="skorProcVal" style="min-width:30px;font-size:13px;">5</span>
+                            </div>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">GPU / VGA</label>
+                            <input type="text" class="form-control" id="inputGpu" name="gpu" placeholder="Klik untuk pilih, atau ketik..." autocomplete="off">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Skor (1-10)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="form-range" name="skor_gpu" id="skorGpu" min="1" max="10" value="5" oninput="document.getElementById('skorGpuVal').textContent = this.value">
+                                <span class="badge bg-primary" id="skorGpuVal" style="min-width:30px;font-size:13px;">5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3 mt-2" style="letter-spacing:0.5px;">Upgradeability</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="upgrade_ram" id="upgradeRam" style="width:2.5em;height:1.3em;cursor:pointer;">
+                                <label class="form-check-label" for="upgradeRam">RAM bisa di-upgrade</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="upgrade_storage" id="upgradeStorage" style="width:2.5em;height:1.3em;cursor:pointer;">
+                                <label class="form-check-label" for="upgradeStorage">Storage bisa di-upgrade</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Simpan
+                        </button>
+                        <a href="/laptop" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Kembali
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+        (function() {
+            function tryInit() {
+                if (typeof window.setupBenchmarkAutofill === 'function') {
+                    window.setupBenchmarkAutofill();
+                } else {
+                    setTimeout(tryInit, 100);
+                }
+                if (typeof window.setupLaptopAutocomplete === 'function') {
+                    window.setupLaptopAutocomplete();
+                } else {
+                    setTimeout(() => {
+                        if (typeof window.setupLaptopAutocomplete === 'function') {
+                            window.setupLaptopAutocomplete();
+                        }
+                    }, 200);
+                }
+            }
+            tryInit();
+        })();
+        </script>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perhitungan TOPSIS - SPK TOPSIS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <script>if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark-preload');</script>
+</head>
+<body class="d-flex" id="wrapper">
+
+<!-- Sidebar Clean -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h5><i class="fas fa-laptop-code me-2"></i>SPK TOPSIS</h5>
+        <small>Pemilihan Laptop Terbaik</small>
+    </div>
+    
+    <ul class="nav flex-column">
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/dashboard">
+                <i class="fas fa-th-large me-3"></i> Dashboard
+            </a>
+        </li>
+        
+        <li class="nav-item mt-3 mb-2">
+            <small class="text-muted px-3">DATA MASTER</small>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/laptop">
+                <i class="fas fa-laptop me-3"></i> Data Laptop
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/kriteria">
+                <i class="fas fa-sliders-h me-3"></i> Data Kriteria
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/nilai">
+                <i class="fas fa-th me-3"></i> Data Nilai
+            </a>
+        </li>
+        
+        <li class="nav-item mt-3 mb-2">
+            <small class="text-muted px-3">ANALISIS</small>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link active" href="/topsis">
+                <i class="fas fa-chart-line me-3"></i> Perhitungan TOPSIS
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/tools/compare">
+                <i class="fas fa-balance-scale me-3"></i> Perbandingan
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/tools/sensitivity">
+                <i class="fas fa-flask me-3"></i> Sensitivity
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/tools/history">
+                <i class="fas fa-history me-3"></i> History
+            </a>
+        </li>
+
+        <li class="nav-item mt-3 mb-2">
+            <small class="text-muted px-3">TOOLS</small>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/tools/import">
+                <i class="fas fa-file-import me-3"></i> Import Data
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link sidebar-link " href="/tools/reset">
+                <i class="fas fa-redo me-3"></i> Reset Data
+            </a>
+        </li>
+    </ul>
+    
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(79,110,247,0.08);display:flex;align-items:center;justify-content:center;margin-right:10px;">
+                <i class="fas fa-user" style="color:#4f6ef7;font-size:12px;"></i>
+            </div>
+            <div>
+                <small class="d-block" style="font-weight:600;color:var(--text);">Hanta</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <!-- Navbar Clean -->
+<nav class="navbar navbar-expand-lg w-100">
+    <div class="container-fluid">
+        <button class="btn btn-secondary btn-sm me-3" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <span class="navbar-brand mb-0">Perhitungan TOPSIS</span>
+        
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <button class="btn btn-secondary btn-sm" id="darkModeToggle" title="Dark Mode">
+                <i class="fas fa-moon" id="darkModeIcon"></i>
+            </button>
+            <span class="btn btn-secondary btn-sm" style="cursor:default;">
+                <i class="fas fa-user me-1"></i> Hanta
+            </span>
+        </div>
+    </div>
+</nav>
+
+    
+    <div class="container-fluid p-4">
+        <!-- Flash Messages -->
+        
+
+        
+
+        <!-- Tombol Export -->
+        <div class="d-flex justify-content-end mb-3 gap-2">
+            <button class="btn btn-success btn-sm" id="btnExportExcel">
+                <i class="fas fa-file-excel me-1"></i> Export Excel
+            </button>
+            <button class="btn btn-danger btn-sm" id="btnExportPDF">
+                <i class="fas fa-file-pdf me-1"></i> Export PDF
+            </button>
+            <button class="btn btn-primary btn-sm" id="btnSaveHistory">
+                <i class="fas fa-save me-1"></i> Simpan ke History
+            </button>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- LANGKAH 1: MATRIKS KEPUTUSAN -->
+        <!-- ============================================ -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-table me-2"></i>Langkah 1: Matriks Keputusan</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Penjelasan:</strong> Matriks keputusan berisi nilai mentah setiap alternatif terhadap setiap kriteria. Baris pembagi (kuning) adalah <code>√(Σx²)</code> per kolom yang akan digunakan untuk normalisasi di langkah 2.
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Alternatif</th>
+                                
+                                    <th class="text-center">Harga (cost)</th>
+                                
+                                    <th class="text-center">RAM (benefit)</th>
+                                
+                                    <th class="text-center">SSD (benefit)</th>
+                                
+                                    <th class="text-center">Baterai (benefit)</th>
+                                
+                                    <th class="text-center">Processor (benefit)</th>
+                                
+                                    <th class="text-center">GPU (benefit)</th>
+                                
+                                    <th class="text-center">Upgrade RAM (benefit)</th>
+                                
+                                    <th class="text-center">Upgrade Storage (benefit)</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td><strong>ASUS VivoBook 14</strong></td>
+                                
+                                    <td class="text-center">7.500.000</td>
+                                
+                                    <td class="text-center">8</td>
+                                
+                                    <td class="text-center">512</td>
+                                
+                                    <td class="text-center">8</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Lenovo IdeaPad Slim 3</strong></td>
+                                
+                                    <td class="text-center">6.800.000</td>
+                                
+                                    <td class="text-center">8</td>
+                                
+                                    <td class="text-center">256</td>
+                                
+                                    <td class="text-center">7</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>HP Pavilion 14</strong></td>
+                                
+                                    <td class="text-center">8.500.000</td>
+                                
+                                    <td class="text-center">16</td>
+                                
+                                    <td class="text-center">512</td>
+                                
+                                    <td class="text-center">9</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Acer Aspire 5</strong></td>
+                                
+                                    <td class="text-center">7.200.000</td>
+                                
+                                    <td class="text-center">8</td>
+                                
+                                    <td class="text-center">512</td>
+                                
+                                    <td class="text-center">8</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Dell Inspiron 15</strong></td>
+                                
+                                    <td class="text-center">9.000.000</td>
+                                
+                                    <td class="text-center">16</td>
+                                
+                                    <td class="text-center">1.024</td>
+                                
+                                    <td class="text-center">10</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">5</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                                    <td class="text-center">0</td>
+                                
+                            </tr>
+                            
+                        </tbody>
+                        <tfoot class="table-warning">
+                            <tr>
+                                <td><strong>Pembagi</strong></td>
+                                
+                                    <td class="text-center">17537958.8322</td>
+                                
+                                    <td class="text-center">26.5330</td>
+                                
+                                    <td class="text-center">1378.6022</td>
+                                
+                                    <td class="text-center">18.9209</td>
+                                
+                                    <td class="text-center">11.1803</td>
+                                
+                                    <td class="text-center">11.1803</td>
+                                
+                                    <td class="text-center">0.0000</td>
+                                
+                                    <td class="text-center">0.0000</td>
+                                
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- LANGKAH 2: MATRIKS NORMALISASI -->
+        <!-- ============================================ -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-success text-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-divide me-2"></i>Langkah 2: Matriks Normalisasi (rij = xij / pembagi)</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Tujuan:</strong> Menyamakan skala semua kriteria (karena harga dalam jutaan, RAM dalam GB, dll). Rumus: <code>rij = xij / √(Σxij²)</code>. Setelah dinormalisasi, semua nilai berada di rentang 0-1.
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Alternatif</th>
+                                
+                                    <th class="text-center">Harga</th>
+                                
+                                    <th class="text-center">RAM</th>
+                                
+                                    <th class="text-center">SSD</th>
+                                
+                                    <th class="text-center">Baterai</th>
+                                
+                                    <th class="text-center">Processor</th>
+                                
+                                    <th class="text-center">GPU</th>
+                                
+                                    <th class="text-center">Upgrade RAM</th>
+                                
+                                    <th class="text-center">Upgrade Storage</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td><strong>ASUS VivoBook 14</strong></td>
+                                
+                                    <td class="text-center">0.427644</td>
+                                
+                                    <td class="text-center">0.301511</td>
+                                
+                                    <td class="text-center">0.371391</td>
+                                
+                                    <td class="text-center">0.422813</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Lenovo IdeaPad Slim 3</strong></td>
+                                
+                                    <td class="text-center">0.387730</td>
+                                
+                                    <td class="text-center">0.301511</td>
+                                
+                                    <td class="text-center">0.185695</td>
+                                
+                                    <td class="text-center">0.369961</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>HP Pavilion 14</strong></td>
+                                
+                                    <td class="text-center">0.484663</td>
+                                
+                                    <td class="text-center">0.603023</td>
+                                
+                                    <td class="text-center">0.371391</td>
+                                
+                                    <td class="text-center">0.475665</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Acer Aspire 5</strong></td>
+                                
+                                    <td class="text-center">0.410538</td>
+                                
+                                    <td class="text-center">0.301511</td>
+                                
+                                    <td class="text-center">0.371391</td>
+                                
+                                    <td class="text-center">0.422813</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Dell Inspiron 15</strong></td>
+                                
+                                    <td class="text-center">0.513173</td>
+                                
+                                    <td class="text-center">0.603023</td>
+                                
+                                    <td class="text-center">0.742781</td>
+                                
+                                    <td class="text-center">0.528516</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.447214</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- LANGKAH 3: MATRIKS TERBOBOT -->
+        <!-- ============================================ -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-info text-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-weight-hanging me-2"></i>Langkah 3: Matriks Normalisasi Terbobot (yij = wi × rij)</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Tujuan:</strong> Memberikan pengaruh bobot kepentingan ke setiap kriteria. Kriteria dengan bobot lebih besar akan punya pengaruh lebih besar pada hasil ranking. Rumus: <code>yij = wi × rij</code>.
+                </div>
+                <p class="text-muted small mb-2">
+                    Bobot: Harga = 0.2, RAM = 0.13, SSD = 0.13, Baterai = 0.1, Processor = 0.15, GPU = 0.13, Upgrade RAM = 0.08, Upgrade Storage = 0.08
+                </p>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Alternatif</th>
+                                
+                                    <th class="text-center">Harga (w=0.2)</th>
+                                
+                                    <th class="text-center">RAM (w=0.13)</th>
+                                
+                                    <th class="text-center">SSD (w=0.13)</th>
+                                
+                                    <th class="text-center">Baterai (w=0.1)</th>
+                                
+                                    <th class="text-center">Processor (w=0.15)</th>
+                                
+                                    <th class="text-center">GPU (w=0.13)</th>
+                                
+                                    <th class="text-center">Upgrade RAM (w=0.08)</th>
+                                
+                                    <th class="text-center">Upgrade Storage (w=0.08)</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td><strong>ASUS VivoBook 14</strong></td>
+                                
+                                    <td class="text-center">0.085529</td>
+                                
+                                    <td class="text-center">0.039196</td>
+                                
+                                    <td class="text-center">0.048281</td>
+                                
+                                    <td class="text-center">0.042281</td>
+                                
+                                    <td class="text-center">0.067082</td>
+                                
+                                    <td class="text-center">0.058138</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Lenovo IdeaPad Slim 3</strong></td>
+                                
+                                    <td class="text-center">0.077546</td>
+                                
+                                    <td class="text-center">0.039196</td>
+                                
+                                    <td class="text-center">0.024140</td>
+                                
+                                    <td class="text-center">0.036996</td>
+                                
+                                    <td class="text-center">0.067082</td>
+                                
+                                    <td class="text-center">0.058138</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>HP Pavilion 14</strong></td>
+                                
+                                    <td class="text-center">0.096933</td>
+                                
+                                    <td class="text-center">0.078393</td>
+                                
+                                    <td class="text-center">0.048281</td>
+                                
+                                    <td class="text-center">0.047567</td>
+                                
+                                    <td class="text-center">0.067082</td>
+                                
+                                    <td class="text-center">0.058138</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Acer Aspire 5</strong></td>
+                                
+                                    <td class="text-center">0.082108</td>
+                                
+                                    <td class="text-center">0.039196</td>
+                                
+                                    <td class="text-center">0.048281</td>
+                                
+                                    <td class="text-center">0.042281</td>
+                                
+                                    <td class="text-center">0.067082</td>
+                                
+                                    <td class="text-center">0.058138</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Dell Inspiron 15</strong></td>
+                                
+                                    <td class="text-center">0.102635</td>
+                                
+                                    <td class="text-center">0.078393</td>
+                                
+                                    <td class="text-center">0.096562</td>
+                                
+                                    <td class="text-center">0.052852</td>
+                                
+                                    <td class="text-center">0.067082</td>
+                                
+                                    <td class="text-center">0.058138</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- LANGKAH 4: SOLUSI IDEAL -->
+        <!-- ============================================ -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-bullseye me-2"></i>Langkah 4: Solusi Ideal Positif (A+) dan Negatif (A-)</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Penjelasan:</strong> A+ = kondisi terbaik yang mungkin (max untuk benefit, min untuk cost). A- = kondisi terburuk (min untuk benefit, max untuk cost). Konsep TOPSIS: alternatif terbaik adalah yang paling dekat ke A+ dan paling jauh dari A-.
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Solusi Ideal</th>
+                                
+                                    <th class="text-center">Harga</th>
+                                
+                                    <th class="text-center">RAM</th>
+                                
+                                    <th class="text-center">SSD</th>
+                                
+                                    <th class="text-center">Baterai</th>
+                                
+                                    <th class="text-center">Processor</th>
+                                
+                                    <th class="text-center">GPU</th>
+                                
+                                    <th class="text-center">Upgrade RAM</th>
+                                
+                                    <th class="text-center">Upgrade Storage</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-success">
+                                <td><strong>A+ (Positif)</strong></td>
+                                
+                                    <td class="text-center">0.077546</td>
+                                
+                                    <td class="text-center">0.078393</td>
+                                
+                                    <td class="text-center">0.096562</td>
+                                
+                                    <td class="text-center">0.052852</td>
+                                
+                                    <td class="text-center">0.067082</td>
+                                
+                                    <td class="text-center">0.058138</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                            <tr class="table-danger">
+                                <td><strong>A- (Negatif)</strong></td>
+                                
+                                    <td class="text-center">0.102635</td>
+                                
+                                    <td class="text-center">0.039196</td>
+                                
+                                    <td class="text-center">0.024140</td>
+                                
+                                    <td class="text-center">0.036996</td>
+                                
+                                    <td class="text-center">0.067082</td>
+                                
+                                    <td class="text-center">0.058138</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                                    <td class="text-center">0.000000</td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Benefit: A+ = max, A- = min | Cost: A+ = min, A- = max
+                </small>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- LANGKAH 5: JARAK D+ DAN D- -->
+        <!-- ============================================ -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-secondary text-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-ruler me-2"></i>Langkah 5: Jarak Solusi Ideal (D+ dan D-)</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Rumus Euclidean:</strong> D+ = √(Σ(yij - A+j)²) untuk jarak ke kondisi terbaik. D- = √(Σ(yij - A-j)²) untuk jarak ke kondisi terburuk. Semakin kecil D+ dan semakin besar D-, semakin baik alternatif tersebut.
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Alternatif</th>
+                                <th class="text-center">D+ (Jarak ke A+)</th>
+                                <th class="text-center">D- (Jarak ke A-)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td><strong>ASUS VivoBook 14</strong></td>
+                                <td class="text-center">0.063584</td>
+                                <td class="text-center">0.030056</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Lenovo IdeaPad Slim 3</strong></td>
+                                <td class="text-center">0.083862</td>
+                                <td class="text-center">0.025089</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>HP Pavilion 14</strong></td>
+                                <td class="text-center">0.052296</td>
+                                <td class="text-center">0.047576</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Acer Aspire 5</strong></td>
+                                <td class="text-center">0.063246</td>
+                                <td class="text-center">0.032126</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>Dell Inspiron 15</strong></td>
+                                <td class="text-center">0.025089</td>
+                                <td class="text-center">0.083862</td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- LANGKAH 6 & 7: NILAI PREFERENSI & RANKING -->
+        <!-- ============================================ -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-dark text-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-trophy me-2"></i>Langkah 6 & 7: Nilai Preferensi & Ranking Akhir</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Rumus Final:</strong> <code>Vi = D- / (D- + D+)</code>. Nilai Vi berada di rentang 0-1. Semakin besar Vi, semakin baik alternatif. Vi = 1 berarti identik dengan solusi ideal positif, Vi = 0 berarti identik dengan solusi ideal negatif. Ranking diurutkan dari Vi terbesar.
+                </div>
+                <p class="text-muted mb-3">
+                    <strong>Rumus:</strong> Vi = D- / (D- + D+) → Semakin besar Vi, semakin baik alternatif tersebut.
+                </p>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="text-center">Ranking</th>
+                                <th>Nama Laptop</th>
+                                <th class="text-center">D+</th>
+                                <th class="text-center">D-</th>
+                                <th class="text-center">Nilai Preferensi (Vi)</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr class="table-success fw-bold">
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-warning text-dark fs-6"><i class="fas fa-crown me-1"></i>1</span>
+                                    
+                                </td>
+                                <td>
+                                    Dell Inspiron 15
+                                    
+                                        <span class="badge bg-success ms-2">TERBAIK</span>
+                                    
+                                </td>
+                                <td class="text-center">0.025089</td>
+                                <td class="text-center">0.083862</td>
+                                <td class="text-center"><strong>0.769722</strong></td>
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-success"><i class="fas fa-star me-1"></i>Ranking 1</span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr class="">
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-secondary">2</span>
+                                    
+                                </td>
+                                <td>
+                                    HP Pavilion 14
+                                    
+                                </td>
+                                <td class="text-center">0.052296</td>
+                                <td class="text-center">0.047576</td>
+                                <td class="text-center"><strong>0.476370</strong></td>
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-light text-dark">Ranking 2</span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr class="">
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-secondary">3</span>
+                                    
+                                </td>
+                                <td>
+                                    Acer Aspire 5
+                                    
+                                </td>
+                                <td class="text-center">0.063246</td>
+                                <td class="text-center">0.032126</td>
+                                <td class="text-center"><strong>0.336849</strong></td>
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-light text-dark">Ranking 3</span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr class="">
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-secondary">4</span>
+                                    
+                                </td>
+                                <td>
+                                    ASUS VivoBook 14
+                                    
+                                </td>
+                                <td class="text-center">0.063584</td>
+                                <td class="text-center">0.030056</td>
+                                <td class="text-center"><strong>0.320974</strong></td>
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-light text-dark">Ranking 4</span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr class="">
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-secondary">5</span>
+                                    
+                                </td>
+                                <td>
+                                    Lenovo IdeaPad Slim 3
+                                    
+                                </td>
+                                <td class="text-center">0.083862</td>
+                                <td class="text-center">0.025089</td>
+                                <td class="text-center"><strong>0.230278</strong></td>
+                                <td class="text-center">
+                                    
+                                        <span class="badge bg-light text-dark">Ranking 5</span>
+                                    
+                                </td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Kesimpulan -->
+                <div class="alert alert-success mt-4">
+                    <h5 class="alert-heading"><i class="fas fa-check-circle me-2"></i>Kesimpulan</h5>
+                    <p class="mb-0">
+                        Berdasarkan perhitungan metode TOPSIS, laptop terbaik adalah 
+                        <strong class="text-primary">Dell Inspiron 15</strong> 
+                        dengan nilai preferensi <strong>0.769722</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Ranking -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-chart-bar me-2 text-primary"></i>Grafik Nilai Preferensi</h6>
+            </div>
+            <div class="card-body" style="height:320px;">
+                <canvas id="rankingChart"></canvas>
+            </div>
+        </div>
+
+        <script>
+        (function() {
+            function initChart() {
+                const canvas = document.getElementById('rankingChart');
+                if (!canvas || typeof Chart === 'undefined') {
+                    return setTimeout(initChart, 50);
+                }
+                const ranking = [{"id_laptop":5,"nama_laptop":"Dell Inspiron 15","nilai_preferensi":0.769722,"jarak_positif":0.025089,"jarak_negatif":0.083862,"ranking":1},{"id_laptop":3,"nama_laptop":"HP Pavilion 14","nilai_preferensi":0.47637,"jarak_positif":0.052296,"jarak_negatif":0.047576,"ranking":2},{"id_laptop":4,"nama_laptop":"Acer Aspire 5","nilai_preferensi":0.336849,"jarak_positif":0.063246,"jarak_negatif":0.032126,"ranking":3},{"id_laptop":1,"nama_laptop":"ASUS VivoBook 14","nilai_preferensi":0.320974,"jarak_positif":0.063584,"jarak_negatif":0.030056,"ranking":4},{"id_laptop":2,"nama_laptop":"Lenovo IdeaPad Slim 3","nilai_preferensi":0.230278,"jarak_positif":0.083862,"jarak_negatif":0.025089,"ranking":5}];
+                const isDark = document.body.classList.contains('dark');
+                const textColor = isDark ? '#cbd5e1' : '#334155';
+                const mutedColor = isDark ? '#94a3b8' : '#64748b';
+                const gridColor = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(15,23,42,0.06)';
+
+                const ctx = canvas.getContext('2d');
+
+                function gradient(color1, color2) {
+                    const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    g.addColorStop(0, color1);
+                    g.addColorStop(1, color2);
+                    return g;
+                }
+
+                Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+                Chart.defaults.font.size = 12;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ranking.map(r => r.nama_laptop),
+                        datasets: [{
+                            label: 'Nilai Preferensi (Vi)',
+                            data: ranking.map(r => r.nilai_preferensi),
+                            backgroundColor: ranking.map((r, i) => i === 0
+                                ? gradient('rgba(34, 197, 94, 1)', 'rgba(34, 197, 94, 0.5)')
+                                : gradient('rgba(99, 102, 241, 0.95)', 'rgba(99, 102, 241, 0.5)')),
+                            borderRadius: 12,
+                            borderSkipped: false,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.85
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart',
+                            delay: (ctx) => ctx.type === 'data' ? ctx.dataIndex * 80 : 0
+                        },
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.98)',
+                                titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                                bodyColor: isDark ? '#cbd5e1' : '#475569',
+                                borderColor: isDark ? '#334155' : '#e2e8f0',
+                                borderWidth: 1,
+                                padding: 12,
+                                cornerRadius: 10,
+                                titleFont: { weight: '700', size: 13 },
+                                bodyFont: { size: 12 },
+                                callbacks: {
+                                    label: (c) => '  Vi: ' + c.parsed.y.toFixed(6)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1,
+                                grid: { color: gridColor, drawBorder: false },
+                                border: { display: false },
+                                ticks: { color: mutedColor, padding: 10, font: { size: 11 } },
+                                title: { display: true, text: 'Nilai Preferensi', color: mutedColor, font: { size: 12, weight: '600' }, padding: { bottom: 10 } }
+                            },
+                            x: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: { color: mutedColor, padding: 8, font: { size: 11, weight: '500' } }
+                            }
+                        }
+                    }
+                });
+            }
+            requestAnimationFrame(initChart);
+        })();
+        </script>
+
+        <!-- Export & History Logic -->
+        <script>
+        (function() {
+            var hasil = {"matriksKeputusan":[[7500000,8,512,8,5,5,0,0],[6800000,8,256,7,5,5,0,0],[8500000,16,512,9,5,5,0,0],[7200000,8,512,8,5,5,0,0],[9000000,16,1024,10,5,5,0,0]],"pembagi":[17537958.832201652,26.5329983228432,1378.602190626433,18.920887928424502,11.180339887498949,11.180339887498949,0,0],"matriksNormalisasi":[[0.427644,0.301511,0.371391,0.422813,0.447214,0.447214,0,0],[0.38773,0.301511,0.185695,0.369961,0.447214,0.447214,0,0],[0.484663,0.603023,0.371391,0.475665,0.447214,0.447214,0,0],[0.410538,0.301511,0.371391,0.422813,0.447214,0.447214,0,0],[0.513173,0.603023,0.742781,0.528516,0.447214,0.447214,0,0]],"matriksTerbobot":[[0.085529,0.039196,0.048281,0.042281,0.067082,0.058138,0,0],[0.077546,0.039196,0.02414,0.036996,0.067082,0.058138,0,0],[0.096933,0.078393,0.048281,0.047567,0.067082,0.058138,0,0],[0.082108,0.039196,0.048281,0.042281,0.067082,0.058138,0,0],[0.102635,0.078393,0.096562,0.052852,0.067082,0.058138,0,0]],"solusiIdealPositif":[0.077546,0.078393,0.096562,0.052852,0.067082,0.058138,0,0],"solusiIdealNegatif":[0.102635,0.039196,0.02414,0.036996,0.067082,0.058138,0,0],"jarakPositif":[0.063584,0.083862,0.052296,0.063246,0.025089],"jarakNegatif":[0.030056,0.025089,0.047576,0.032126,0.083862],"nilaiPreferensi":[0.320974,0.230278,0.47637,0.336849,0.769722],"ranking":[{"id_laptop":5,"nama_laptop":"Dell Inspiron 15","nilai_preferensi":0.769722,"jarak_positif":0.025089,"jarak_negatif":0.083862,"ranking":1},{"id_laptop":3,"nama_laptop":"HP Pavilion 14","nilai_preferensi":0.47637,"jarak_positif":0.052296,"jarak_negatif":0.047576,"ranking":2},{"id_laptop":4,"nama_laptop":"Acer Aspire 5","nilai_preferensi":0.336849,"jarak_positif":0.063246,"jarak_negatif":0.032126,"ranking":3},{"id_laptop":1,"nama_laptop":"ASUS VivoBook 14","nilai_preferensi":0.320974,"jarak_positif":0.063584,"jarak_negatif":0.030056,"ranking":4},{"id_laptop":2,"nama_laptop":"Lenovo IdeaPad Slim 3","nilai_preferensi":0.230278,"jarak_positif":0.083862,"jarak_negatif":0.025089,"ranking":5}],"alternatif":[{"id_laptop":1,"nama_laptop":"ASUS VivoBook 14","harga":7500000,"ram":8,"ssd":512,"baterai":8,"created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04","processor":"","skor_processor":5,"gpu":"","skor_gpu":5,"upgrade_ram":0,"upgrade_storage":0},{"id_laptop":2,"nama_laptop":"Lenovo IdeaPad Slim 3","harga":6800000,"ram":8,"ssd":256,"baterai":7,"created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04","processor":"","skor_processor":5,"gpu":"","skor_gpu":5,"upgrade_ram":0,"upgrade_storage":0},{"id_laptop":3,"nama_laptop":"HP Pavilion 14","harga":8500000,"ram":16,"ssd":512,"baterai":9,"created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04","processor":"","skor_processor":5,"gpu":"","skor_gpu":5,"upgrade_ram":0,"upgrade_storage":0},{"id_laptop":4,"nama_laptop":"Acer Aspire 5","harga":7200000,"ram":8,"ssd":512,"baterai":8,"created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04","processor":"","skor_processor":5,"gpu":"","skor_gpu":5,"upgrade_ram":0,"upgrade_storage":0},{"id_laptop":5,"nama_laptop":"Dell Inspiron 15","harga":9000000,"ram":16,"ssd":1024,"baterai":10,"created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04","processor":"","skor_processor":5,"gpu":"","skor_gpu":5,"upgrade_ram":0,"upgrade_storage":0}],"kriteria":[{"id_kriteria":1,"nama_kriteria":"Harga","bobot":0.2,"tipe":"cost","created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04"},{"id_kriteria":2,"nama_kriteria":"RAM","bobot":0.13,"tipe":"benefit","created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04"},{"id_kriteria":3,"nama_kriteria":"SSD","bobot":0.13,"tipe":"benefit","created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04"},{"id_kriteria":4,"nama_kriteria":"Baterai","bobot":0.1,"tipe":"benefit","created_at":"2026-05-18 05:18:04","updated_at":"2026-05-18 05:18:04"},{"id_kriteria":5,"nama_kriteria":"Processor","bobot":0.15,"tipe":"benefit","created_at":"2026-05-18 10:36:46","updated_at":"2026-05-18 10:36:46"},{"id_kriteria":6,"nama_kriteria":"GPU","bobot":0.13,"tipe":"benefit","created_at":"2026-05-18 10:36:46","updated_at":"2026-05-18 10:36:46"},{"id_kriteria":7,"nama_kriteria":"Upgrade RAM","bobot":0.08,"tipe":"benefit","created_at":"2026-05-18 10:36:46","updated_at":"2026-05-18 10:36:46"},{"id_kriteria":8,"nama_kriteria":"Upgrade Storage","bobot":0.08,"tipe":"benefit","created_at":"2026-05-18 10:36:46","updated_at":"2026-05-18 10:36:46"}]};
+            
+            function getDarkBg() { return document.body.classList.contains('dark') ? '#1e293b' : '#fff'; }
+            function getDarkColor() { return document.body.classList.contains('dark') ? '#f1f5f9' : '#1e293b'; }
+
+            function showError(msg) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'error', title: 'Error', text: msg, background: getDarkBg(), color: getDarkColor() });
+                } else {
+                    alert(msg);
+                }
+            }
+
+            function showSuccess(msg) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: msg, timer: 2000, showConfirmButton: false, background: getDarkBg(), color: getDarkColor() });
+                }
+            }
+
+            // ============================================
+            // EXPORT EXCEL (RAPI dengan styling)
+            // ============================================
+            function exportExcel() {
+                if (typeof XLSX === 'undefined') {
+                    showError('Library Excel belum siap. Tunggu sebentar lalu coba lagi.');
+                    return;
+                }
+
+                try {
+                    var wb = XLSX.utils.book_new();
+                    var tanggal = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+                    var winner = hasil.ranking[0];
+
+                    // ===== SHEET 1: RINGKASAN =====
+                    var ringkasan = [
+                        ['LAPORAN PERHITUNGAN TOPSIS'],
+                        ['SPK Pemilihan Laptop Terbaik'],
+                        [''],
+                        ['Tanggal Cetak', tanggal],
+                        ['Total Alternatif', hasil.alternatif.length],
+                        ['Total Kriteria', hasil.kriteria.length],
+                        [''],
+                        ['HASIL: LAPTOP TERBAIK'],
+                        ['Nama', winner.nama_laptop],
+                        ['Nilai Preferensi (Vi)', winner.nilai_preferensi.toFixed(6)],
+                        ['Jarak ke Solusi Ideal Positif (D+)', winner.jarak_positif.toFixed(6)],
+                        ['Jarak ke Solusi Ideal Negatif (D-)', winner.jarak_negatif.toFixed(6)]
+                    ];
+                    var wsRingkasan = XLSX.utils.aoa_to_sheet(ringkasan);
+                    wsRingkasan['!cols'] = [{ wch: 35 }, { wch: 35 }];
+                    // Merge cells untuk title
+                    wsRingkasan['!merges'] = [
+                        { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
+                        { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
+                        { s: { r: 7, c: 0 }, e: { r: 7, c: 1 } }
+                    ];
+                    XLSX.utils.book_append_sheet(wb, wsRingkasan, 'Ringkasan');
+
+                    // ===== SHEET 2: RANKING =====
+                    var rankingHeader = ['Ranking', 'Nama Laptop', 'D+', 'D-', 'Nilai Preferensi (Vi)', 'Status'];
+                    var rankingRows = hasil.ranking.map(function(r, i) {
+                        return [
+                            r.ranking,
+                            r.nama_laptop,
+                            parseFloat(r.jarak_positif.toFixed(6)),
+                            parseFloat(r.jarak_negatif.toFixed(6)),
+                            parseFloat(r.nilai_preferensi.toFixed(6)),
+                            i === 0 ? 'TERBAIK' : ''
+                        ];
+                    });
+                    var wsRanking = XLSX.utils.aoa_to_sheet([rankingHeader].concat(rankingRows));
+                    wsRanking['!cols'] = [{ wch: 10 }, { wch: 30 }, { wch: 14 }, { wch: 14 }, { wch: 22 }, { wch: 12 }];
+                    XLSX.utils.book_append_sheet(wb, wsRanking, 'Ranking Akhir');
+
+                    // ===== SHEET 3: DATA LAPTOP =====
+                    var laptopHeader = ['No', 'Nama Laptop', 'Harga (Rp)', 'RAM (GB)', 'SSD (GB)', 'Baterai (Jam)', 'Processor', 'Skor Proc', 'GPU', 'Skor GPU', 'Upgrade RAM', 'Upgrade Storage'];
+                    var laptopRows = hasil.alternatif.map(function(alt, i) {
+                        return [
+                            i + 1,
+                            alt.nama_laptop,
+                            alt.harga,
+                            alt.ram,
+                            alt.ssd,
+                            alt.baterai,
+                            alt.processor || '-',
+                            alt.skor_processor || 5,
+                            alt.gpu || '-',
+                            alt.skor_gpu || 5,
+                            alt.upgrade_ram ? 'Ya' : 'Tidak',
+                            alt.upgrade_storage ? 'Ya' : 'Tidak'
+                        ];
+                    });
+                    var wsLaptop = XLSX.utils.aoa_to_sheet([laptopHeader].concat(laptopRows));
+                    wsLaptop['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 25 }, { wch: 10 }, { wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 14 }];
+                    XLSX.utils.book_append_sheet(wb, wsLaptop, 'Data Laptop');
+
+                    // ===== SHEET 4: DATA KRITERIA =====
+                    var kriteriaHeader = ['No', 'Kode', 'Nama Kriteria', 'Bobot', 'Tipe'];
+                    var kriteriaRows = hasil.kriteria.map(function(k, i) {
+                        return [i + 1, 'C' + (i + 1), k.nama_kriteria, parseFloat(k.bobot), k.tipe];
+                    });
+                    var totalBobot = hasil.kriteria.reduce(function(s, k) { return s + parseFloat(k.bobot); }, 0);
+                    kriteriaRows.push(['', '', 'TOTAL BOBOT', parseFloat(totalBobot.toFixed(4)), '']);
+                    var wsKriteria = XLSX.utils.aoa_to_sheet([kriteriaHeader].concat(kriteriaRows));
+                    wsKriteria['!cols'] = [{ wch: 5 }, { wch: 8 }, { wch: 25 }, { wch: 12 }, { wch: 12 }];
+                    XLSX.utils.book_append_sheet(wb, wsKriteria, 'Data Kriteria');
+
+                    // ===== SHEET 5: MATRIKS KEPUTUSAN =====
+                    var mkHeader = ['Alternatif'].concat(hasil.kriteria.map(function(k) { return k.nama_kriteria + ' [' + k.tipe + ']'; }));
+                    var mkRows = hasil.alternatif.map(function(alt, i) {
+                        return [alt.nama_laptop].concat(hasil.matriksKeputusan[i]);
+                    });
+                    mkRows.push(['Pembagi (√Σx²)'].concat(hasil.pembagi.map(function(v) { return parseFloat(v.toFixed(4)); })));
+                    var wsMK = XLSX.utils.aoa_to_sheet([mkHeader].concat(mkRows));
+                    wsMK['!cols'] = [{ wch: 25 }].concat(hasil.kriteria.map(function() { return { wch: 18 }; }));
+                    XLSX.utils.book_append_sheet(wb, wsMK, '1.Matriks Keputusan');
+
+                    // ===== SHEET 6: NORMALISASI =====
+                    var normHeader = ['Alternatif'].concat(hasil.kriteria.map(function(k) { return k.nama_kriteria; }));
+                    var normRows = hasil.alternatif.map(function(alt, i) {
+                        return [alt.nama_laptop].concat(hasil.matriksNormalisasi[i].map(function(v) { return parseFloat(v.toFixed(6)); }));
+                    });
+                    var wsNorm = XLSX.utils.aoa_to_sheet([normHeader].concat(normRows));
+                    wsNorm['!cols'] = [{ wch: 25 }].concat(hasil.kriteria.map(function() { return { wch: 14 }; }));
+                    XLSX.utils.book_append_sheet(wb, wsNorm, '2.Normalisasi');
+
+                    // ===== SHEET 7: TERBOBOT =====
+                    var tbHeader = ['Alternatif'].concat(hasil.kriteria.map(function(k) { return k.nama_kriteria + ' (w=' + k.bobot + ')'; }));
+                    var tbRows = hasil.alternatif.map(function(alt, i) {
+                        return [alt.nama_laptop].concat(hasil.matriksTerbobot[i].map(function(v) { return parseFloat(v.toFixed(6)); }));
+                    });
+                    var wsTB = XLSX.utils.aoa_to_sheet([tbHeader].concat(tbRows));
+                    wsTB['!cols'] = [{ wch: 25 }].concat(hasil.kriteria.map(function() { return { wch: 18 }; }));
+                    XLSX.utils.book_append_sheet(wb, wsTB, '3.Terbobot');
+
+                    // ===== SHEET 8: SOLUSI IDEAL =====
+                    var idealHeader = ['Solusi'].concat(hasil.kriteria.map(function(k) { return k.nama_kriteria + ' [' + k.tipe + ']'; }));
+                    var idealRows = [
+                        ['A+ (Solusi Ideal Positif)'].concat(hasil.solusiIdealPositif.map(function(v) { return parseFloat(v.toFixed(6)); })),
+                        ['A- (Solusi Ideal Negatif)'].concat(hasil.solusiIdealNegatif.map(function(v) { return parseFloat(v.toFixed(6)); }))
+                    ];
+                    var wsIdeal = XLSX.utils.aoa_to_sheet([idealHeader].concat(idealRows));
+                    wsIdeal['!cols'] = [{ wch: 30 }].concat(hasil.kriteria.map(function() { return { wch: 18 }; }));
+                    XLSX.utils.book_append_sheet(wb, wsIdeal, '4.Solusi Ideal');
+
+                    // ===== SHEET 9: JARAK & PREFERENSI =====
+                    var jarakHeader = ['Alternatif', 'Jarak D+ (ke A+)', 'Jarak D- (ke A-)', 'D+ + D-', 'Vi = D-/(D-+D+)', 'Ranking'];
+                    var jarakRows = hasil.alternatif.map(function(alt, i) {
+                        var dp = hasil.jarakPositif[i];
+                        var dn = hasil.jarakNegatif[i];
+                        var vi = hasil.nilaiPreferensi[i];
+                        var rank = hasil.ranking.find(function(r) { return r.id_laptop === alt.id_laptop; });
+                        return [
+                            alt.nama_laptop,
+                            parseFloat(dp.toFixed(6)),
+                            parseFloat(dn.toFixed(6)),
+                            parseFloat((dp + dn).toFixed(6)),
+                            parseFloat(vi.toFixed(6)),
+                            rank ? rank.ranking : '-'
+                        ];
+                    });
+                    var wsJarak = XLSX.utils.aoa_to_sheet([jarakHeader].concat(jarakRows));
+                    wsJarak['!cols'] = [{ wch: 25 }, { wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 18 }, { wch: 10 }];
+                    XLSX.utils.book_append_sheet(wb, wsJarak, '5.Jarak & Preferensi');
+
+                    var fileName = 'SPK_TOPSIS_' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '_' + new Date().getHours() + new Date().getMinutes() + '.xlsx';
+                    XLSX.writeFile(wb, fileName);
+                    showSuccess('Excel berhasil di-download: ' + fileName);
+                } catch (err) {
+                    console.error(err);
+                    showError('Gagal export Excel: ' + err.message);
+                }
+            }
+
+            // ============================================
+            // EXPORT PDF (RAPI dengan layout profesional)
+            // ============================================
+            function exportPDF() {
+                if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+                    showError('Library PDF belum siap. Tunggu sebentar lalu coba lagi.');
+                    return;
+                }
+
+                try {
+                    var jsPDF = window.jspdf.jsPDF;
+                    var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    var pageW = doc.internal.pageSize.getWidth();
+                    var pageH = doc.internal.pageSize.getHeight();
+                    var margin = 14;
+                    var y = margin;
+                    var winner = hasil.ranking[0];
+
+                    // ===== HEADER =====
+                    // Background bar
+                    doc.setFillColor(79, 110, 247);
+                    doc.rect(0, 0, pageW, 30, 'F');
+                    
+                    // Title
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(18);
+                    doc.setTextColor(255, 255, 255);
+                    doc.text('LAPORAN PERHITUNGAN TOPSIS', pageW / 2, 12, { align: 'center' });
+                    
+                    doc.setFontSize(11);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('Sistem Pendukung Keputusan Pemilihan Laptop Terbaik', pageW / 2, 19, { align: 'center' });
+                    
+                    doc.setFontSize(9);
+                    doc.text('Dicetak: ' + new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }), pageW / 2, 25, { align: 'center' });
+                    
+                    y = 38;
+
+                    // ===== KESIMPULAN BOX =====
+                    doc.setFillColor(220, 252, 231);
+                    doc.setDrawColor(34, 197, 94);
+                    doc.setLineWidth(0.5);
+                    doc.roundedRect(margin, y, pageW - margin * 2, 24, 2, 2, 'FD');
+                    
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(11);
+                    doc.setTextColor(21, 128, 61);
+                    doc.text('KESIMPULAN: LAPTOP TERBAIK', margin + 4, y + 6);
+                    
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(14);
+                    doc.setTextColor(20, 20, 20);
+                    doc.text(winner.nama_laptop, margin + 4, y + 13);
+                    
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(9);
+                    doc.setTextColor(80, 80, 80);
+                    doc.text('Nilai Preferensi (Vi): ' + winner.nilai_preferensi.toFixed(6) + 
+                             '   |   D+: ' + winner.jarak_positif.toFixed(4) + 
+                             '   |   D-: ' + winner.jarak_negatif.toFixed(4), margin + 4, y + 20);
+                    
+                    y += 32;
+
+                    // ===== INFO BOX =====
+                    doc.setFontSize(9);
+                    doc.setTextColor(80, 80, 80);
+                    doc.text('Total Alternatif: ' + hasil.alternatif.length + '   |   Total Kriteria: ' + hasil.kriteria.length, margin, y);
+                    y += 6;
+
+                    // Helper function for section title
+                    function sectionTitle(text, color) {
+                        if (y > pageH - 40) { doc.addPage(); y = margin; }
+                        color = color || [79, 110, 247];
+                        doc.setFillColor(color[0], color[1], color[2]);
+                        doc.rect(margin, y, pageW - margin * 2, 7, 'F');
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(10);
+                        doc.setTextColor(255, 255, 255);
+                        doc.text(text, margin + 3, y + 5);
+                        y += 9;
+                    }
+
+                    // ===== SECTION 1: RANKING =====
+                    sectionTitle('1. RANKING AKHIR', [79, 110, 247]);
+                    doc.autoTable({
+                        startY: y,
+                        head: [['Ranking', 'Nama Laptop', 'D+', 'D-', 'Vi', 'Status']],
+                        body: hasil.ranking.map(function(r, i) {
+                            return [
+                                r.ranking,
+                                r.nama_laptop,
+                                r.jarak_positif.toFixed(6),
+                                r.jarak_negatif.toFixed(6),
+                                r.nilai_preferensi.toFixed(6),
+                                i === 0 ? 'TERBAIK' : ''
+                            ];
+                        }),
+                        theme: 'grid',
+                        headStyles: { fillColor: [79, 110, 247], textColor: 255, fontStyle: 'bold', fontSize: 9 },
+                        styles: { fontSize: 9, cellPadding: 2 },
+                        alternateRowStyles: { fillColor: [248, 250, 252] },
+                        didParseCell: function(data) {
+                            if (data.section === 'body' && data.row.index === 0) {
+                                data.cell.styles.fillColor = [220, 252, 231];
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                    });
+                    y = doc.lastAutoTable.finalY + 6;
+
+                    // ===== SECTION 2: DATA KRITERIA =====
+                    sectionTitle('2. DATA KRITERIA', [16, 185, 129]);
+                    var totalBobot = hasil.kriteria.reduce(function(s, k) { return s + parseFloat(k.bobot); }, 0);
+                    doc.autoTable({
+                        startY: y,
+                        head: [['Kode', 'Nama Kriteria', 'Bobot', 'Tipe']],
+                        body: hasil.kriteria.map(function(k, i) {
+                            return ['C' + (i + 1), k.nama_kriteria, k.bobot, k.tipe.toUpperCase()];
+                        }).concat([['', 'TOTAL', totalBobot.toFixed(4), '']]),
+                        theme: 'grid',
+                        headStyles: { fillColor: [16, 185, 129], textColor: 255, fontStyle: 'bold', fontSize: 9 },
+                        styles: { fontSize: 9, cellPadding: 2 },
+                        alternateRowStyles: { fillColor: [240, 253, 244] }
+                    });
+                    y = doc.lastAutoTable.finalY + 6;
+
+                    // ===== SECTION 3: MATRIKS KEPUTUSAN =====
+                    sectionTitle('3. MATRIKS KEPUTUSAN', [99, 102, 241]);
+                    var mkHead = ['Alternatif'].concat(hasil.kriteria.map(function(k) { return k.nama_kriteria; }));
+                    var mkBody = hasil.alternatif.map(function(alt, i) {
+                        return [alt.nama_laptop].concat(hasil.matriksKeputusan[i].map(function(v) { return v.toLocaleString('id-ID'); }));
+                    });
+                    mkBody.push(['Pembagi'].concat(hasil.pembagi.map(function(v) { return v.toFixed(4); })));
+                    doc.autoTable({
+                        startY: y, head: [mkHead], body: mkBody,
+                        theme: 'grid',
+                        headStyles: { fillColor: [99, 102, 241], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+                        styles: { fontSize: 8, cellPadding: 1.5 },
+                        alternateRowStyles: { fillColor: [248, 250, 252] }
+                    });
+                    y = doc.lastAutoTable.finalY + 6;
+
+                    // ===== SECTION 4: NORMALISASI =====
+                    if (y > pageH - 40) { doc.addPage(); y = margin; }
+                    sectionTitle('4. MATRIKS NORMALISASI (rij = xij / pembagi)', [34, 197, 94]);
+                    doc.autoTable({
+                        startY: y,
+                        head: [['Alternatif'].concat(hasil.kriteria.map(function(k) { return k.nama_kriteria; }))],
+                        body: hasil.alternatif.map(function(alt, i) {
+                            return [alt.nama_laptop].concat(hasil.matriksNormalisasi[i].map(function(v) { return v.toFixed(4); }));
+                        }),
+                        theme: 'grid',
+                        headStyles: { fillColor: [34, 197, 94], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+                        styles: { fontSize: 8, cellPadding: 1.5 },
+                        alternateRowStyles: { fillColor: [240, 253, 244] }
+                    });
+                    y = doc.lastAutoTable.finalY + 6;
+
+                    // ===== SECTION 5: TERBOBOT =====
+                    if (y > pageH - 40) { doc.addPage(); y = margin; }
+                    sectionTitle('5. MATRIKS NORMALISASI TERBOBOT (yij = wi x rij)', [6, 182, 212]);
+                    doc.autoTable({
+                        startY: y,
+                        head: [['Alternatif'].concat(hasil.kriteria.map(function(k) { return k.nama_kriteria + ' (' + k.bobot + ')'; }))],
+                        body: hasil.alternatif.map(function(alt, i) {
+                            return [alt.nama_laptop].concat(hasil.matriksTerbobot[i].map(function(v) { return v.toFixed(4); }));
+                        }),
+                        theme: 'grid',
+                        headStyles: { fillColor: [6, 182, 212], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+                        styles: { fontSize: 8, cellPadding: 1.5 },
+                        alternateRowStyles: { fillColor: [236, 254, 255] }
+                    });
+                    y = doc.lastAutoTable.finalY + 6;
+
+                    // ===== SECTION 6: SOLUSI IDEAL =====
+                    if (y > pageH - 40) { doc.addPage(); y = margin; }
+                    sectionTitle('6. SOLUSI IDEAL POSITIF (A+) DAN NEGATIF (A-)', [234, 179, 8]);
+                    doc.autoTable({
+                        startY: y,
+                        head: [['Solusi'].concat(hasil.kriteria.map(function(k) { return k.nama_kriteria; }))],
+                        body: [
+                            ['A+ Positif'].concat(hasil.solusiIdealPositif.map(function(v) { return v.toFixed(4); })),
+                            ['A- Negatif'].concat(hasil.solusiIdealNegatif.map(function(v) { return v.toFixed(4); }))
+                        ],
+                        theme: 'grid',
+                        headStyles: { fillColor: [234, 179, 8], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+                        styles: { fontSize: 8, cellPadding: 2, fontStyle: 'bold' },
+                        didParseCell: function(data) {
+                            if (data.section === 'body') {
+                                if (data.row.index === 0) data.cell.styles.fillColor = [254, 249, 195];
+                                else data.cell.styles.fillColor = [254, 226, 226];
+                            }
+                        }
+                    });
+                    y = doc.lastAutoTable.finalY + 6;
+
+                    // ===== SECTION 7: JARAK =====
+                    if (y > pageH - 40) { doc.addPage(); y = margin; }
+                    sectionTitle('7. JARAK SOLUSI IDEAL & NILAI PREFERENSI', [168, 85, 247]);
+                    doc.autoTable({
+                        startY: y,
+                        head: [['Alternatif', 'D+', 'D-', 'D+ + D-', 'Vi', 'Rank']],
+                        body: hasil.alternatif.map(function(alt, i) {
+                            var dp = hasil.jarakPositif[i];
+                            var dn = hasil.jarakNegatif[i];
+                            var vi = hasil.nilaiPreferensi[i];
+                            var rank = hasil.ranking.find(function(r) { return r.id_laptop === alt.id_laptop; });
+                            return [
+                                alt.nama_laptop,
+                                dp.toFixed(6),
+                                dn.toFixed(6),
+                                (dp + dn).toFixed(6),
+                                vi.toFixed(6),
+                                rank ? rank.ranking : '-'
+                            ];
+                        }),
+                        theme: 'grid',
+                        headStyles: { fillColor: [168, 85, 247], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+                        styles: { fontSize: 8, cellPadding: 1.5 },
+                        alternateRowStyles: { fillColor: [250, 245, 255] }
+                    });
+
+                    // ===== FOOTER (semua halaman) =====
+                    var pageCount = doc.internal.getNumberOfPages();
+                    for (var i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        // Garis footer
+                        doc.setDrawColor(200, 200, 200);
+                        doc.setLineWidth(0.2);
+                        doc.line(margin, pageH - 13, pageW - margin, pageH - 13);
+                        
+                        doc.setFontSize(8);
+                        doc.setTextColor(120, 120, 120);
+                        doc.setFont('helvetica', 'normal');
+                        doc.text('SPK TOPSIS - Pemilihan Laptop Terbaik', margin, pageH - 8);
+                        doc.text('Halaman ' + i + ' dari ' + pageCount, pageW - margin, pageH - 8, { align: 'right' });
+                    }
+
+                    var fileName = 'SPK_TOPSIS_' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '.pdf';
+                    doc.save(fileName);
+                    showSuccess('PDF berhasil di-download: ' + fileName);
+                } catch (err) {
+                    console.error(err);
+                    showError('Gagal export PDF: ' + err.message);
+                }
+            }
+
+            // ============================================
+            // SAVE TO HISTORY
+            // ============================================
+            function saveHistory() {
+                fetch('/tools/history/save', { method: 'POST' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) showSuccess('Hasil disimpan ke history');
+                        else showError(data.error || 'Gagal simpan history');
+                    })
+                    .catch(function(err) { showError(err.message); });
+            }
+
+            // ============================================
+            // BIND BUTTONS
+            // ============================================
+            var btnExcel = document.getElementById('btnExportExcel');
+            if (btnExcel) btnExcel.addEventListener('click', exportExcel);
+
+            var btnPDF = document.getElementById('btnExportPDF');
+            if (btnPDF) btnPDF.addEventListener('click', exportPDF);
+
+            var btnSave = document.getElementById('btnSaveHistory');
+            if (btnSave) btnSave.addEventListener('click', saveHistory);
+        })();
+        </script>
+
+        
+    </div>
+</div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Export libraries (local) -->
+    <script src="/libs/jspdf.umd.min.js"></script>
+    <script src="/libs/jspdf.plugin.autotable.min.js"></script>
+    <script src="/libs/xlsx.full.min.js"></script>
+    <!-- Benchmark Database -->
+    <script src="/js/benchmarks.js"></script>
+    <!-- Custom JS -->
+    <script src="/js/script.js"></script>
+</body>
+</html>
+

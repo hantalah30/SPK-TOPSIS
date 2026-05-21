@@ -1,0 +1,135 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <!-- Flash Messages -->
+        <% if (success && success.length > 0) { %>
+            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({icon:'success',title:'Berhasil',text:'<%= success %>',timer:3000,showConfirmButton:false}));</script>
+        <% } %>
+        <% if (error && error.length > 0) { %>
+            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({icon:'error',title:'Error',text:'<%= error %>',timer:3000,showConfirmButton:false}));</script>
+        <% } %>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-list-check me-2 text-success"></i>Data Kriteria</h5>
+                <a href="/kriteria/create" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus me-1"></i> Tambah Kriteria
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="dataTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="5%">No</th>
+                                <th>Nama Kriteria</th>
+                                <th>Bobot</th>
+                                <th>Tipe</th>
+                                <th width="15%">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% kriteria.forEach((krit, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><strong><%= krit.nama_kriteria %></strong></td>
+                                <td><%= krit.bobot %></td>
+                                <td>
+                                    <% if (krit.tipe === 'benefit') { %>
+                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>Benefit</span>
+                                    <% } else { %>
+                                        <span class="badge bg-danger"><i class="fas fa-arrow-down me-1"></i>Cost</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <a href="/kriteria/edit/<%= krit.id_kriteria %>" class="btn btn-warning btn-sm" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-danger btn-sm btn-delete" data-url="/kriteria/delete/<%= krit.id_kriteria %>" data-name="<%= krit.nama_kriteria %>" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Info Bobot dengan validasi visual -->
+                <% const totalBobot = kriteria.reduce((sum, k) => sum + parseFloat(k.bobot), 0); %>
+                <% const isValid = Math.abs(totalBobot - 1.0) < 0.001; %>
+                <div class="alert <%= isValid ? 'alert-success' : 'alert-warning' %> mt-3 d-flex align-items-center">
+                    <i class="fas <%= isValid ? 'fa-check-circle' : 'fa-exclamation-triangle' %> me-2"></i>
+                    <div class="flex-grow-1">
+                        <strong>Total Bobot:</strong>
+                        <span class="ms-2 fw-bold" style="font-size:16px;"><%= totalBobot.toFixed(3) %></span>
+                        <span class="text-muted ms-1">/ 1.000</span>
+                        <% if (isValid) { %>
+                            <span class="badge bg-success ms-2">VALID</span>
+                        <% } else { %>
+                            <span class="badge bg-warning ms-2">
+                                <%= totalBobot > 1 ? 'Lebih ' + (totalBobot - 1).toFixed(3) : 'Kurang ' + (1 - totalBobot).toFixed(3) %>
+                            </span>
+                        <% } %>
+                    </div>
+                    <% if (!isValid) { %>
+                        <button class="btn btn-warning btn-sm" id="btnAutoNormalize">
+                            <i class="fas fa-magic me-1"></i> Auto-Normalize
+                        </button>
+                    <% } %>
+                </div>
+                
+                <% if (!isValid) { %>
+                    <div class="alert alert-info mt-2 small mb-0">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        <strong>Catatan TOPSIS:</strong> Total bobot semua kriteria <strong>harus = 1.0 (100%)</strong> agar perhitungan TOPSIS menghasilkan nilai preferensi yang valid. Klik Auto-Normalize untuk menyesuaikan bobot otomatis dengan proporsi yang sama.
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+(function() {
+    var table = document.getElementById('dataTable');
+    if (table && window.jQuery) {
+        if ($.fn.DataTable.isDataTable(table)) {
+            $(table).DataTable().destroy();
+        }
+        $(table).DataTable({
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json' }
+        });
+    }
+
+    // Auto-Normalize button
+    var autoBtn = document.getElementById('btnAutoNormalize');
+    if (autoBtn) {
+        autoBtn.addEventListener('click', function() {
+            var isDark = document.body.classList.contains('dark');
+            Swal.fire({
+                title: 'Auto-Normalize Bobot?',
+                text: 'Sistem akan menyesuaikan bobot kriteria secara otomatis dengan proporsi yang sama agar total = 1.0',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4f6ef7',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Normalize',
+                cancelButtonText: 'Batal',
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#f1f5f9' : '#1e293b'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    window.location.href = '/kriteria/auto-normalize';
+                }
+            });
+        });
+    }
+})();
+</script>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Datang - SPK TOPSIS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .welcome-card {
+            background: white;
+            border: 1px solid #e8ecf2;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            max-width: 400px;
+            width: 100%;
+            animation: slideUp 0.4s ease;
+            text-align: center;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-header {
+            padding: 40px 32px 24px;
+            border-bottom: 1px solid #f1f4f8;
+        }
+
+        .welcome-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: rgba(79, 110, 247, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            color: #4f6ef7;
+            font-size: 26px;
+        }
+
+        .welcome-header h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .welcome-header p {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .welcome-body { padding: 28px 32px 36px; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label {
+            display: block;
+            color: #1e293b;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid #e8ecf2;
+            border-radius: 8px;
+            color: #1e293b;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            outline: none;
+            text-align: center;
+        }
+
+        .form-group input::placeholder { color: #94a3b8; }
+        .form-group input:focus {
+            border-color: #4f6ef7;
+            box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.1);
+            background: white;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 12px;
+            background: #4f6ef7;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, 0.25);
+        }
+        .btn-start:hover {
+            background: #3b5de7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 110, 247, 0.3);
+        }
+        .btn-start:active { transform: translateY(0); }
+
+        .note {
+            margin-top: 16px;
+            color: #94a3b8;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-card">
+        <div class="welcome-header">
+            <div class="welcome-icon"><i class="fas fa-laptop-code"></i></div>
+            <h3>SPK TOPSIS</h3>
+            <p>Pemilihan Laptop Terbaik</p>
+        </div>
+        <div class="welcome-body">
+            <form action="/welcome" method="POST">
+                <div class="form-group">
+                    <label>Siapa nama kamu?</label>
+                    <input type="text" name="nama" placeholder="Masukkan nama kamu" required autofocus maxlength="50">
+                </div>
+                <button type="submit" class="btn-start">
+                    <i class="fas fa-arrow-right me-1"></i> Mulai
+                </button>
+            </form>
+            <p class="note">Nama akan tersimpan, tidak perlu input lagi nanti.</p>
+        </div>
+    </div>
+</body>
+</html>

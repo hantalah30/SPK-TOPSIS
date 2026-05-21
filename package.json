@@ -1,0 +1,90 @@
+{
+  "name": "spk-topsis-laptop",
+  "version": "1.0.0",
+  "description": "SPK Pemilihan Laptop Terbaik Menggunakan Metode TOPSIS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "nodemon --exec electron .",
+    "build": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:all": "electron-builder --win --mac",
+    "server": "node app.js"
+  },
+  "keywords": [
+    "spk",
+    "topsis",
+    "decision-support-system",
+    "laptop",
+    "electron"
+  ],
+  "author": "Mahasiswa",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.6.0",
+    "connect-flash": "^0.1.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3"
+  },
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "markdown-pdf": "^11.0.0",
+    "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "^3.11.174"
+  },
+  "build": {
+    "appId": "com.spk.topsis.laptop",
+    "productName": "SPK TOPSIS - Pemilihan Laptop",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**",
+      "!database/*.db",
+      "!database/*.db-wal",
+      "!database/*.db-shm",
+      "!node_modules/.cache/**",
+      "!scripts/**"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "public/icon.png",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "SPK TOPSIS - Pemilihan Laptop",
+      "icon": "public/icon.ico",
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SPK TOPSIS Laptop"
+    }
+  }
+}

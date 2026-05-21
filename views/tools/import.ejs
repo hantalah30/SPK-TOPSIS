@@ -1,0 +1,149 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-file-import me-2 text-primary"></i>Import Data Laptop dari Excel/CSV</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Upload file <strong>.xlsx</strong> atau <strong>.csv</strong> dengan kolom berikut (urutan harus sesuai):
+                    <code>nama_laptop, harga, ram, ssd, baterai, processor, skor_processor, gpu, skor_gpu, upgrade_ram, upgrade_storage</code>
+                </div>
+
+                <div class="mb-3">
+                    <button class="btn btn-secondary btn-sm" id="btnDownloadTemplate">
+                        <i class="fas fa-download me-1"></i> Download Template Excel
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Pilih file Excel/CSV</label>
+                    <input type="file" class="form-control" id="fileInput" accept=".xlsx,.xls,.csv">
+                </div>
+
+                <div id="previewSection" style="display:none;">
+                    <h6 class="fw-bold mb-2">Preview Data:</h6>
+                    <div class="table-responsive" style="max-height:300px;overflow-y:auto;">
+                        <table class="table table-sm table-bordered" id="previewTable"></table>
+                    </div>
+                    <button class="btn btn-primary mt-3" id="btnImport">
+                        <i class="fas fa-upload me-1"></i> Import ke Database
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+        <script>
+        (function() {
+            var parsedData = [];
+            var fileInput = document.getElementById('fileInput');
+            var previewSection = document.getElementById('previewSection');
+            var previewTable = document.getElementById('previewTable');
+            var isDark = document.body.classList.contains('dark');
+            var bg = isDark ? '#1e293b' : '#fff';
+            var color = isDark ? '#f1f5f9' : '#1e293b';
+
+            fileInput.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        var data = new Uint8Array(ev.target.result);
+                        var workbook = XLSX.read(data, { type: 'array' });
+                        var sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        var json = XLSX.utils.sheet_to_json(sheet);
+                        parsedData = json;
+                        renderPreview(json);
+                    } catch (err) {
+                        Swal.fire({ icon: 'error', title: 'Gagal Baca File', text: err.message, background: bg, color: color });
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+
+            function renderPreview(rows) {
+                if (!rows || rows.length === 0) {
+                    previewSection.style.display = 'none';
+                    return;
+                }
+                var headers = Object.keys(rows[0]);
+                var html = '<thead class="table-light"><tr>';
+                headers.forEach(function(h) { html += '<th>' + h + '</th>'; });
+                html += '</tr></thead><tbody>';
+                rows.slice(0, 20).forEach(function(r) {
+                    html += '<tr>';
+                    headers.forEach(function(h) { html += '<td>' + (r[h] !== undefined ? r[h] : '-') + '</td>'; });
+                    html += '</tr>';
+                });
+                html += '</tbody>';
+                previewTable.innerHTML = html;
+                if (rows.length > 20) {
+                    previewTable.innerHTML += '<caption>Menampilkan 20 dari ' + rows.length + ' baris</caption>';
+                }
+                previewSection.style.display = 'block';
+            }
+
+            document.getElementById('btnImport').addEventListener('click', function() {
+                if (parsedData.length === 0) return;
+                Swal.fire({
+                    title: 'Import ' + parsedData.length + ' laptop?',
+                    icon: 'question', showCancelButton: true,
+                    confirmButtonText: 'Ya, Import', cancelButtonText: 'Batal',
+                    background: bg, color: color
+                }).then(function(r) {
+                    if (!r.isConfirmed) return;
+                    fetch('/tools/import/process', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ laptops: parsedData })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success', title: 'Berhasil!',
+                                text: data.imported + ' laptop berhasil diimport',
+                                background: bg, color: color
+                            }).then(() => window.location.href = '/laptop');
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Error', text: data.error, background: bg, color: color });
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('btnDownloadTemplate').addEventListener('click', function() {
+                var template = [
+                    {
+                        nama_laptop: 'Contoh Laptop',
+                        harga: 7500000,
+                        ram: 8,
+                        ssd: 512,
+                        baterai: 8,
+                        processor: 'Intel Core i5-1235U',
+                        skor_processor: 7,
+                        gpu: 'Intel Iris Xe',
+                        skor_gpu: 4,
+                        upgrade_ram: 1,
+                        upgrade_storage: 1
+                    }
+                ];
+                var ws = XLSX.utils.json_to_sheet(template);
+                var wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Laptop');
+                XLSX.writeFile(wb, 'template-laptop.xlsx');
+            });
+        })();
+        </script>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,300 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <!-- Flash Messages -->
+        <% if (success && success.length > 0) { %>
+            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({icon:'success',title:'Berhasil',text:'<%= success %>',timer:3000,showConfirmButton:false}));</script>
+        <% } %>
+
+        <!-- Statistik Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-laptop fa-lg"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h3 class="mb-0 fw-bold"><%= stats.totalLaptop %></h3>
+                                <small class="text-muted">Total Laptop</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-list-check fa-lg"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h3 class="mb-0 fw-bold"><%= stats.totalKriteria %></h3>
+                                <small class="text-muted">Total Kriteria</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="fas fa-table fa-lg"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h3 class="mb-0 fw-bold"><%= stats.totalNilai %></h3>
+                                <small class="text-muted">Data Nilai</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-info bg-opacity-10 text-info">
+                                <i class="fas fa-calculator fa-lg"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h3 class="mb-0 fw-bold">TOPSIS</h3>
+                                <small class="text-muted">Metode SPK</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart & Info -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-chart-bar me-2 text-primary"></i>Perbandingan Spesifikasi Laptop</h6>
+                    </div>
+                    <div class="card-body" style="height:340px;">
+                        <canvas id="laptopChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2 text-primary"></i>Informasi Sistem</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="fas fa-cog me-2 text-muted"></i>Metode</span>
+                                <span class="badge bg-primary">TOPSIS</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="fas fa-laptop me-2 text-muted"></i>Alternatif</span>
+                                <span class="badge bg-success"><%= stats.totalLaptop %> Laptop</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="fas fa-list me-2 text-muted"></i>Kriteria</span>
+                                <span class="badge bg-warning"><%= stats.totalKriteria %> Kriteria</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span><i class="fas fa-user me-2 text-muted"></i>Pengguna</span>
+                                <span class="badge bg-info"><%= user.nama %></span>
+                            </li>
+                        </ul>
+                        
+                        <hr>
+                        
+                        <div class="text-center">
+                            <a href="/topsis" class="btn btn-primary btn-sm">
+                                <i class="fas fa-play me-1"></i> Lihat Hasil TOPSIS
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-bolt me-2 text-warning"></i>Aksi Cepat</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/laptop/create" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i> Tambah Laptop
+                            </a>
+                            <a href="/kriteria" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-edit me-1"></i> Kelola Kriteria
+                            </a>
+                            <a href="/nilai" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-table me-1"></i> Input Nilai
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        // Chart.js - Perbandingan Laptop (premium look)
+        (function() {
+            function initChart() {
+                const canvas = document.getElementById('laptopChart');
+                if (!canvas || typeof Chart === 'undefined') {
+                    return setTimeout(initChart, 50);
+                }
+                const laptops = <%- JSON.stringify(laptops) %>;
+                if (laptops.length === 0) return;
+
+                const isDark = document.body.classList.contains('dark');
+                const textColor = isDark ? '#cbd5e1' : '#334155';
+                const mutedColor = isDark ? '#94a3b8' : '#64748b';
+                const gridColor = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(15,23,42,0.06)';
+
+                const ctx = canvas.getContext('2d');
+
+                // Helper: create vertical gradient
+                function gradient(color1, color2) {
+                    const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    g.addColorStop(0, color1);
+                    g.addColorStop(1, color2);
+                    return g;
+                }
+
+                Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+                Chart.defaults.font.size = 12;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: laptops.map(l => l.nama_laptop),
+                        datasets: [
+                            {
+                                label: 'Harga (Juta)',
+                                data: laptops.map(l => +(l.harga / 1000000).toFixed(1)),
+                                backgroundColor: gradient('rgba(239, 68, 68, 0.95)', 'rgba(239, 68, 68, 0.55)'),
+                                borderRadius: 8,
+                                borderSkipped: false,
+                                barPercentage: 0.85,
+                                categoryPercentage: 0.85
+                            },
+                            {
+                                label: 'RAM (GB)',
+                                data: laptops.map(l => l.ram),
+                                backgroundColor: gradient('rgba(99, 102, 241, 0.95)', 'rgba(99, 102, 241, 0.55)'),
+                                borderRadius: 8,
+                                borderSkipped: false,
+                                barPercentage: 0.85,
+                                categoryPercentage: 0.85
+                            },
+                            {
+                                label: 'SSD (GB/10)',
+                                data: laptops.map(l => l.ssd / 10),
+                                backgroundColor: gradient('rgba(34, 197, 94, 0.95)', 'rgba(34, 197, 94, 0.55)'),
+                                borderRadius: 8,
+                                borderSkipped: false,
+                                barPercentage: 0.85,
+                                categoryPercentage: 0.85
+                            },
+                            {
+                                label: 'Baterai (Jam)',
+                                data: laptops.map(l => l.baterai),
+                                backgroundColor: gradient('rgba(234, 179, 8, 0.95)', 'rgba(234, 179, 8, 0.55)'),
+                                borderRadius: 8,
+                                borderSkipped: false,
+                                barPercentage: 0.85,
+                                categoryPercentage: 0.85
+                            },
+                            {
+                                label: 'Skor Processor',
+                                data: laptops.map(l => l.skor_processor || 5),
+                                backgroundColor: gradient('rgba(6, 182, 212, 0.95)', 'rgba(6, 182, 212, 0.55)'),
+                                borderRadius: 8,
+                                borderSkipped: false,
+                                barPercentage: 0.85,
+                                categoryPercentage: 0.85
+                            },
+                            {
+                                label: 'Skor GPU',
+                                data: laptops.map(l => l.skor_gpu || 5),
+                                backgroundColor: gradient('rgba(168, 85, 247, 0.95)', 'rgba(168, 85, 247, 0.55)'),
+                                borderRadius: 8,
+                                borderSkipped: false,
+                                barPercentage: 0.85,
+                                categoryPercentage: 0.85
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 900,
+                            easing: 'easeOutQuart',
+                            delay: (ctx) => ctx.type === 'data' ? ctx.dataIndex * 60 + ctx.datasetIndex * 30 : 0
+                        },
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                align: 'end',
+                                labels: {
+                                    color: textColor,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    boxWidth: 8,
+                                    boxHeight: 8,
+                                    padding: 16,
+                                    font: { size: 12, weight: '600' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.98)',
+                                titleColor: isDark ? '#f1f5f9' : '#1e293b',
+                                bodyColor: isDark ? '#cbd5e1' : '#475569',
+                                borderColor: isDark ? '#334155' : '#e2e8f0',
+                                borderWidth: 1,
+                                padding: 12,
+                                cornerRadius: 10,
+                                titleFont: { weight: '700', size: 13 },
+                                bodyFont: { size: 12 },
+                                boxPadding: 6,
+                                usePointStyle: true,
+                                displayColors: true
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: gridColor, drawBorder: false },
+                                border: { display: false },
+                                ticks: { color: mutedColor, padding: 10, font: { size: 11 } }
+                            },
+                            x: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: { color: mutedColor, padding: 8, font: { size: 11, weight: '500' } }
+                            }
+                        }
+                    }
+                });
+            }
+            requestAnimationFrame(initChart);
+        })();
+        </script>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

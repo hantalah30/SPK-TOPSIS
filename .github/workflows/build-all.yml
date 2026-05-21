@@ -1,0 +1,37 @@
+name: Build All Platforms
+
+on:
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx electron-builder --win
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SPK-TOPSIS-Windows
+          path: dist/*.exe
+          retention-days: 30
+
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx electron-builder --mac --x64 --arm64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SPK-TOPSIS-macOS
+          path: dist/*.zip
+          retention-days: 30

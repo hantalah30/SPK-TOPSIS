@@ -1,0 +1,160 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-flask me-2 text-primary"></i>Sensitivity Analysis</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Geser slider bobot untuk melihat <strong>bagaimana ranking berubah</strong> jika prioritas diubah. 
+                    Hasil akan terupdate <strong>real-time</strong>. Berguna untuk uji "what-if" dalam pengambilan keputusan.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Slider Bobot -->
+            <div class="col-md-5">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-sliders-h me-2"></i>Bobot Kriteria</h6>
+                        <button class="btn btn-sm btn-secondary" id="btnResetBobot">
+                            <i class="fas fa-undo me-1"></i> Reset
+                        </button>
+                    </div>
+                    <div class="card-body" id="bobotContainer">
+                        <% kriteria.forEach((k, idx) => { %>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0 small fw-bold">
+                                    <%= k.nama_kriteria %>
+                                    <span class="badge bg-<%= k.tipe === 'benefit' ? 'success' : 'danger' %> ms-1" style="font-size:9px;"><%= k.tipe %></span>
+                                </label>
+                                <span class="badge bg-primary" id="bobotVal<%= idx %>"><%= k.bobot.toFixed(2) %></span>
+                            </div>
+                            <input type="range" class="form-range bobot-slider" 
+                                data-idx="<%= idx %>"
+                                data-original="<%= k.bobot %>"
+                                min="0" max="1" step="0.01" 
+                                value="<%= k.bobot %>">
+                        </div>
+                        <% }); %>
+                        
+                        <div class="alert mt-3" id="totalAlert">
+                            <small>Total Bobot: <strong id="totalBobotDisplay"><%= kriteria.reduce((s,k)=>s+parseFloat(k.bobot),0).toFixed(2) %></strong> / 1.00</small>
+                            <span class="badge ms-2" id="totalBobotBadge"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hasil Ranking Live -->
+            <div class="col-md-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-trophy me-2"></i>Ranking Real-Time</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="rankingResult">
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p class="mt-2">Menghitung...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        (function() {
+            function calc() {
+                var sliders = document.querySelectorAll('.bobot-slider');
+                var bobotBaru = [];
+                var total = 0;
+                sliders.forEach(function(s, i) {
+                    var val = parseFloat(s.value);
+                    bobotBaru.push(val);
+                    total += val;
+                    document.getElementById('bobotVal' + i).textContent = val.toFixed(2);
+                });
+
+                // Update total display
+                var totalDisp = document.getElementById('totalBobotDisplay');
+                var totalBadge = document.getElementById('totalBobotBadge');
+                var totalAlert = document.getElementById('totalAlert');
+                totalDisp.textContent = total.toFixed(2);
+                if (Math.abs(total - 1.0) < 0.01) {
+                    totalAlert.className = 'alert alert-success mt-3';
+                    totalBadge.textContent = 'VALID';
+                    totalBadge.className = 'badge bg-success ms-2';
+                } else {
+                    totalAlert.className = 'alert alert-warning mt-3';
+                    totalBadge.textContent = total > 1 ? 'Lebih ' + (total-1).toFixed(2) : 'Kurang ' + (1-total).toFixed(2);
+                    totalBadge.className = 'badge bg-warning ms-2';
+                }
+
+                // Send to server
+                fetch('/tools/sensitivity/calc', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bobotBaru: bobotBaru })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.success) {
+                        document.getElementById('rankingResult').innerHTML = '<div class="alert alert-danger">' + (data.error || 'Error') + '</div>';
+                        return;
+                    }
+                    renderRanking(data.ranking);
+                });
+            }
+
+            function renderRanking(ranking) {
+                var html = '<div class="table-responsive"><table class="table table-hover">';
+                html += '<thead class="table-light"><tr><th width="10%">#</th><th>Laptop</th><th>D+</th><th>D-</th><th>Vi</th></tr></thead><tbody>';
+                ranking.forEach(function(r, i) {
+                    var rowClass = i === 0 ? 'table-success fw-bold' : '';
+                    var rankBadge = i === 0 ? '<span class="badge bg-warning text-dark"><i class="fas fa-crown"></i> 1</span>' : '<span class="badge bg-secondary">' + r.ranking + '</span>';
+                    html += '<tr class="' + rowClass + '">';
+                    html += '<td>' + rankBadge + '</td>';
+                    html += '<td><strong>' + r.nama_laptop + '</strong></td>';
+                    html += '<td>' + r.jarak_positif.toFixed(4) + '</td>';
+                    html += '<td>' + r.jarak_negatif.toFixed(4) + '</td>';
+                    html += '<td><strong>' + r.nilai_preferensi.toFixed(4) + '</strong></td>';
+                    html += '</tr>';
+                });
+                html += '</tbody></table></div>';
+                document.getElementById('rankingResult').innerHTML = html;
+            }
+
+            // Debounce
+            var timer;
+            document.querySelectorAll('.bobot-slider').forEach(function(s) {
+                s.addEventListener('input', function() {
+                    clearTimeout(timer);
+                    timer = setTimeout(calc, 200);
+                });
+            });
+
+            // Reset button
+            document.getElementById('btnResetBobot').addEventListener('click', function() {
+                document.querySelectorAll('.bobot-slider').forEach(function(s) {
+                    s.value = s.dataset.original;
+                });
+                calc();
+            });
+
+            // Initial calc
+            calc();
+        })();
+        </script>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,129 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <% if (success && success.length > 0) { %>
+            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({icon:'success',title:'Berhasil',text:'<%= success %>',timer:3000,showConfirmButton:false}));</script>
+        <% } %>
+        <% if (error && error.length > 0) { %>
+            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({icon:'error',title:'Error',text:'<%= error %>',timer:3000,showConfirmButton:false}));</script>
+        <% } %>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-redo me-2 text-primary"></i>Reset ke Default</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Mengembalikan semua data ke kondisi awal:</p>
+                        <ul class="text-muted small">
+                            <li>5 laptop contoh (ASUS, Lenovo, HP, Acer, Dell)</li>
+                            <li>8 kriteria default dengan bobot total 1.0</li>
+                            <li>Semua nilai laptop terhadap kriteria</li>
+                        </ul>
+                        <div class="alert alert-warning small mb-3">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <strong>Perhatian:</strong> Data yang sudah ada akan terhapus permanen.
+                        </div>
+                        <form action="/tools/reset/default" method="POST" id="formResetDefault">
+                            <button type="button" class="btn btn-primary w-100" id="btnResetDefault">
+                                <i class="fas fa-redo me-1"></i> Reset ke Default
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-trash me-2 text-danger"></i>Hapus Semua Laptop</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Mengosongkan tabel laptop dan nilai. Kriteria tidak ikut terhapus.</p>
+                        <ul class="text-muted small">
+                            <li>Hapus semua data laptop</li>
+                            <li>Hapus semua nilai</li>
+                            <li>Kriteria tetap ada</li>
+                        </ul>
+                        <div class="alert alert-danger small mb-3">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            <strong>Bahaya:</strong> Aksi ini tidak bisa dibatalkan!
+                        </div>
+                        <form action="/tools/reset/clear" method="POST" id="formClear">
+                            <button type="button" class="btn btn-danger w-100" id="btnClear">
+                                <i class="fas fa-trash me-1"></i> Hapus Semua Laptop
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-database me-2 text-info"></i>Status Database</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h3 class="fw-bold text-primary"><%= stats.totalLaptop %></h3>
+                                <small class="text-muted">Total Laptop</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h3 class="fw-bold text-success"><%= stats.totalKriteria %></h3>
+                                <small class="text-muted">Total Kriteria</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h3 class="fw-bold text-warning"><%= stats.totalNilai %></h3>
+                                <small class="text-muted">Total Nilai</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        (function() {
+            var isDark = document.body.classList.contains('dark');
+            var bg = isDark ? '#1e293b' : '#fff';
+            var color = isDark ? '#f1f5f9' : '#1e293b';
+
+            document.getElementById('btnResetDefault').addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Reset ke Default?',
+                    text: 'Semua data akan dikembalikan ke kondisi awal.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4f6ef7',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Ya, Reset',
+                    cancelButtonText: 'Batal',
+                    background: bg, color: color
+                }).then(function(r) { if (r.isConfirmed) document.getElementById('formResetDefault').submit(); });
+            });
+
+            document.getElementById('btnClear').addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Hapus Semua Laptop?',
+                    text: 'Semua data laptop akan terhapus permanen!',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Ya, Hapus Semua',
+                    cancelButtonText: 'Batal',
+                    background: bg, color: color
+                }).then(function(r) { if (r.isConfirmed) document.getElementById('formClear').submit(); });
+            });
+        })();
+        </script>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

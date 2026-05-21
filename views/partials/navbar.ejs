@@ -1,0 +1,19 @@
+<!-- Navbar Clean -->
+<nav class="navbar navbar-expand-lg w-100">
+    <div class="container-fluid">
+        <button class="btn btn-secondary btn-sm me-3" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <span class="navbar-brand mb-0"><%= title %></span>
+        
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <button class="btn btn-secondary btn-sm" id="darkModeToggle" title="Dark Mode">
+                <i class="fas fa-moon" id="darkModeIcon"></i>
+            </button>
+            <span class="btn btn-secondary btn-sm" style="cursor:default;">
+                <i class="fas fa-user me-1"></i> <%= user ? user.nama : '' %>
+            </span>
+        </div>
+    </div>
+</nav>

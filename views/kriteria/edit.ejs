@@ -1,0 +1,100 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <% if (error && error.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-exclamation-circle me-2"></i><%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-edit me-2 text-warning"></i>Edit Kriteria</h5>
+            </div>
+            <div class="card-body">
+                <form action="/kriteria/edit/<%= kriteria.id_kriteria %>" method="POST" id="formKriteria">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Nama Kriteria <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="nama_kriteria" value="<%= kriteria.nama_kriteria %>" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Bobot (0-1) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="bobot" id="bobotInput" value="<%= kriteria.bobot %>" step="0.01" min="0" max="1" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tipe <span class="text-danger">*</span></label>
+                            <select class="form-select" name="tipe" required>
+                                <option value="benefit" <%= kriteria.tipe === 'benefit' ? 'selected' : '' %>>Benefit</option>
+                                <option value="cost" <%= kriteria.tipe === 'cost' ? 'selected' : '' %>>Cost</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Real-time validator -->
+                    <div id="bobotValidator" class="alert mb-3" style="display:flex;align-items:center;gap:10px;">
+                        <i class="fas fa-calculator"></i>
+                        <div class="flex-grow-1">
+                            <small>Bobot lain (kriteria selain ini): <strong><%= otherTotal.toFixed(3) %></strong></small><br>
+                            <small>Total setelah update: <strong id="totalDisplay">-</strong> / 1.000</small>
+                        </div>
+                        <span class="badge" id="validBadge"></span>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning" id="btnSubmit">
+                            <i class="fas fa-save me-1"></i> Update
+                        </button>
+                        <a href="/kriteria" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Kembali
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+        (function() {
+            var otherTotal = <%= otherTotal %>;
+            var input = document.getElementById('bobotInput');
+            var totalDisplay = document.getElementById('totalDisplay');
+            var validBadge = document.getElementById('validBadge');
+            var validator = document.getElementById('bobotValidator');
+            var btnSubmit = document.getElementById('btnSubmit');
+
+            function updateValidator() {
+                var bobot = parseFloat(input.value) || 0;
+                var total = otherTotal + bobot;
+                totalDisplay.textContent = total.toFixed(3);
+
+                if (Math.abs(total - 1.0) < 0.001) {
+                    validator.classList.remove('alert-warning', 'alert-danger');
+                    validator.classList.add('alert-success');
+                    validBadge.textContent = 'VALID';
+                    validBadge.className = 'badge bg-success';
+                    btnSubmit.disabled = false;
+                } else {
+                    validator.classList.remove('alert-success', 'alert-danger');
+                    validator.classList.add('alert-warning');
+                    var diff = Math.abs(total - 1.0).toFixed(3);
+                    validBadge.textContent = total > 1 ? 'Lebih ' + diff : 'Kurang ' + diff;
+                    validBadge.className = 'badge bg-warning';
+                    btnSubmit.disabled = false;
+                }
+            }
+
+            if (input) {
+                input.addEventListener('input', updateValidator);
+                updateValidator();
+            }
+        })();
+        </script>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

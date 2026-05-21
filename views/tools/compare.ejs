@@ -1,0 +1,190 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper" id="page-content-wrapper">
+    <%- include('../partials/navbar') %>
+    
+    <div class="container-fluid p-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-balance-scale me-2 text-primary"></i>Perbandingan 2 Laptop (Head-to-Head)</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="/tools/compare">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Laptop 1</label>
+                            <select class="form-select" name="id1" required>
+                                <option value="">-- Pilih Laptop --</option>
+                                <% laptops.forEach(l => { %>
+                                    <option value="<%= l.id_laptop %>" <%= laptop1 && laptop1.id_laptop === l.id_laptop ? 'selected' : '' %>><%= l.nama_laptop %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Laptop 2</label>
+                            <select class="form-select" name="id2" required>
+                                <option value="">-- Pilih Laptop --</option>
+                                <% laptops.forEach(l => { %>
+                                    <option value="<%= l.id_laptop %>" <%= laptop2 && laptop2.id_laptop === l.id_laptop ? 'selected' : '' %>><%= l.nama_laptop %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-1"></i> Bandingkan
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <% if (laptop1 && laptop2) { %>
+        <div class="row g-4">
+            <!-- Card laptop 1 -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header py-3" style="background:linear-gradient(135deg,rgba(79,110,247,0.1),rgba(79,110,247,0.04));border-bottom:2px solid #4f6ef7;">
+                        <h5 class="mb-0 fw-bold text-primary"><i class="fas fa-laptop me-2"></i><%= laptop1.nama_laptop %></h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless mb-0">
+                            <tr><td class="text-muted">Harga</td><td class="text-end fw-bold">Rp <%= laptop1.harga.toLocaleString('id-ID') %></td></tr>
+                            <tr><td class="text-muted">RAM</td><td class="text-end fw-bold"><%= laptop1.ram %> GB</td></tr>
+                            <tr><td class="text-muted">SSD</td><td class="text-end fw-bold"><%= laptop1.ssd %> GB</td></tr>
+                            <tr><td class="text-muted">Baterai</td><td class="text-end fw-bold"><%= laptop1.baterai %> Jam</td></tr>
+                            <tr><td class="text-muted">Processor</td><td class="text-end small"><%= laptop1.processor || '-' %></td></tr>
+                            <tr><td class="text-muted">Skor Processor</td><td class="text-end fw-bold"><%= laptop1.skor_processor || 5 %>/10</td></tr>
+                            <tr><td class="text-muted">GPU</td><td class="text-end small"><%= laptop1.gpu || '-' %></td></tr>
+                            <tr><td class="text-muted">Skor GPU</td><td class="text-end fw-bold"><%= laptop1.skor_gpu || 5 %>/10</td></tr>
+                            <tr><td class="text-muted">Upgrade RAM</td><td class="text-end"><span class="badge bg-<%= laptop1.upgrade_ram ? 'success' : 'secondary' %>"><%= laptop1.upgrade_ram ? 'Ya' : 'Tidak' %></span></td></tr>
+                            <tr><td class="text-muted">Upgrade Storage</td><td class="text-end"><span class="badge bg-<%= laptop1.upgrade_storage ? 'success' : 'secondary' %>"><%= laptop1.upgrade_storage ? 'Ya' : 'Tidak' %></span></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card laptop 2 -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header py-3" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.04));border-bottom:2px solid #22c55e;">
+                        <h5 class="mb-0 fw-bold text-success"><i class="fas fa-laptop me-2"></i><%= laptop2.nama_laptop %></h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless mb-0">
+                            <tr><td class="text-muted">Harga</td><td class="text-end fw-bold">Rp <%= laptop2.harga.toLocaleString('id-ID') %></td></tr>
+                            <tr><td class="text-muted">RAM</td><td class="text-end fw-bold"><%= laptop2.ram %> GB</td></tr>
+                            <tr><td class="text-muted">SSD</td><td class="text-end fw-bold"><%= laptop2.ssd %> GB</td></tr>
+                            <tr><td class="text-muted">Baterai</td><td class="text-end fw-bold"><%= laptop2.baterai %> Jam</td></tr>
+                            <tr><td class="text-muted">Processor</td><td class="text-end small"><%= laptop2.processor || '-' %></td></tr>
+                            <tr><td class="text-muted">Skor Processor</td><td class="text-end fw-bold"><%= laptop2.skor_processor || 5 %>/10</td></tr>
+                            <tr><td class="text-muted">GPU</td><td class="text-end small"><%= laptop2.gpu || '-' %></td></tr>
+                            <tr><td class="text-muted">Skor GPU</td><td class="text-end fw-bold"><%= laptop2.skor_gpu || 5 %>/10</td></tr>
+                            <tr><td class="text-muted">Upgrade RAM</td><td class="text-end"><span class="badge bg-<%= laptop2.upgrade_ram ? 'success' : 'secondary' %>"><%= laptop2.upgrade_ram ? 'Ya' : 'Tidak' %></span></td></tr>
+                            <tr><td class="text-muted">Upgrade Storage</td><td class="text-end"><span class="badge bg-<%= laptop2.upgrade_storage ? 'success' : 'secondary' %>"><%= laptop2.upgrade_storage ? 'Ya' : 'Tidak' %></span></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radar Chart -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-chart-pie me-2 text-primary"></i>Visualisasi Perbandingan (Radar Chart)</h6>
+                    </div>
+                    <div class="card-body" style="height:400px;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+            (function() {
+                function initRadar() {
+                    var canvas = document.getElementById('radarChart');
+                    if (!canvas || typeof Chart === 'undefined') return setTimeout(initRadar, 50);
+
+                    var laptop1 = <%- JSON.stringify(laptop1) %>;
+                    var laptop2 = <%- JSON.stringify(laptop2) %>;
+                    var isDark = document.body.classList.contains('dark');
+
+                    // Normalize values to 0-10 scale
+                    function normalize(val, max) { return Math.min(10, (val / max) * 10); }
+
+                    var data1 = [
+                        normalize(15000000 - laptop1.harga, 15000000), // Harga (cost, dibalik)
+                        normalize(laptop1.ram, 32),
+                        normalize(laptop1.ssd, 1024),
+                        normalize(laptop1.baterai, 12),
+                        laptop1.skor_processor || 5,
+                        laptop1.skor_gpu || 5
+                    ];
+                    var data2 = [
+                        normalize(15000000 - laptop2.harga, 15000000),
+                        normalize(laptop2.ram, 32),
+                        normalize(laptop2.ssd, 1024),
+                        normalize(laptop2.baterai, 12),
+                        laptop2.skor_processor || 5,
+                        laptop2.skor_gpu || 5
+                    ];
+
+                    new Chart(canvas, {
+                        type: 'radar',
+                        data: {
+                            labels: ['Harga (Murah)', 'RAM', 'SSD', 'Baterai', 'Processor', 'GPU'],
+                            datasets: [
+                                {
+                                    label: laptop1.nama_laptop,
+                                    data: data1,
+                                    backgroundColor: 'rgba(79,110,247,0.2)',
+                                    borderColor: '#4f6ef7',
+                                    borderWidth: 2,
+                                    pointBackgroundColor: '#4f6ef7',
+                                    pointRadius: 4
+                                },
+                                {
+                                    label: laptop2.nama_laptop,
+                                    data: data2,
+                                    backgroundColor: 'rgba(34,197,94,0.2)',
+                                    borderColor: '#22c55e',
+                                    borderWidth: 2,
+                                    pointBackgroundColor: '#22c55e',
+                                    pointRadius: 4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                r: {
+                                    beginAtZero: true,
+                                    max: 10,
+                                    ticks: { color: isDark ? '#94a3b8' : '#64748b', backdropColor: 'transparent' },
+                                    grid: { color: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' },
+                                    angleLines: { color: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' },
+                                    pointLabels: { color: isDark ? '#cbd5e1' : '#334155', font: { size: 12, weight: '600' } }
+                                }
+                            },
+                            plugins: {
+                                legend: { position: 'top', labels: { color: isDark ? '#cbd5e1' : '#334155', font: { weight: '600' } } }
+                            }
+                        }
+                    });
+                }
+                requestAnimationFrame(initRadar);
+            })();
+            </script>
+        </div>
+        <% } else { %>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Pilih 2 laptop di atas untuk membandingkan spesifikasi side-by-side.
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
